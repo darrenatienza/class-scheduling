@@ -16,6 +16,16 @@ const ClassScheduleItem = () => {
       id: 2,
       timeStart: "07:00",
       timeEnd: "07:30",
+      facultyName: "Juan Tamad",
+      room: "NB101",
+      section: "BSBA",
+      subject: "Law",
+      dayOfWeek: "Tuesday",
+    },
+    {
+      id: 3,
+      timeStart: "07:00",
+      timeEnd: "07:30",
       facultyName: "Tristan Tamad",
       room: "NB101",
       section: "BSBA",
@@ -28,13 +38,26 @@ const ClassScheduleItem = () => {
     { id: 2, timeStart: "07:30", timeEnd: "8:00" },
   ];
 
-  const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday"];
+  const idStore = [];
+
+  const isExists = (id) => {
+    if (id !== undefined) {
+      const _id = idStore.filter((s) => s === id);
+      if (_id.length > 0) {
+        // id already exists
+        console.log(id + "exits");
+        return true;
+      } else {
+        // id not exists
+        idStore.push(id);
+        return false;
+      }
+    }
+  };
   // component render view
   return timeRanges.map(({ id, timeStart, timeEnd }) => {
     const trTimeStart = moment(timeStart, "HH:mm");
     const trTimeEnd = moment(timeEnd, "HH:mm");
-
-    const _schedules = [];
 
     const monday = schedules.filter(
       ({ id, timeStart: _timeStart, timeEnd: _timeEnd, dayOfWeek }) => {
@@ -47,7 +70,7 @@ const ClassScheduleItem = () => {
         );
       }
     )[0];
-
+    isExists(monday.id);
     const tuesday = schedules.filter(
       ({ id, timeStart: _timeStart, timeEnd: _timeEnd, dayOfWeek }) => {
         const sTimeStart = moment(_timeStart, "HH:mm");
@@ -59,6 +82,7 @@ const ClassScheduleItem = () => {
         );
       }
     )[0];
+    if (tuesday !== undefined) isExists(tuesday.id);
 
     const wednesday = schedules.filter(
       ({ id, timeStart: _timeStart, timeEnd: _timeEnd, dayOfWeek }) => {
@@ -116,8 +140,6 @@ const ClassScheduleItem = () => {
         );
       }
     )[0];
-
-    console.log(wednesday);
 
     return (
       <tr key={id}>

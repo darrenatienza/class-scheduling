@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { Table } from "react-bootstrap";
 import moment from "moment";
-import ClassScheduleItem from './ClassScheduleItem';
+import ClassScheduleItem2 from './ClassScheduleItem2';
 const App = () => {
   
   return (
@@ -31,7 +31,7 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-         <ClassScheduleItem />
+         <ClassScheduleItem2 />
          
           
         </tbody>

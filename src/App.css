@@ -1,13 +1,26 @@
 .App {
   margin-top: 10px;
 }
-header{
+
+header {
   margin-bottom: 5px;
   font-weight: bold;
 }
 
-table td.fit, 
+table td.fit,
 table th.fit {
-    white-space: nowrap;
-    width: 1%;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.highlight-bottom {
+  background: linear-gradient(to top, tomato 49%, rgba(0, 0, 0, .0) 51%);
+}
+
+.highlight-top {
+  background: linear-gradient(to bottom, tomato 49%, rgba(0, 0, 0, .0) 51%);
+}
+
+.highlight-whole {
+  background: tomato;
 }
