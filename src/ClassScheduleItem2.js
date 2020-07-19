@@ -69,6 +69,21 @@ const ClassScheduleItem2 = () => {
     }
   };
 
+  const createTimeArr = (startTime, endTime) => {
+    if (startTime !== undefined && endTime !== undefined) {
+      const f = "HH:mm";
+      const timeStart = moment(startTime, f);
+      const timeEnd = moment(endTime, f);
+      const timeArr = [];
+      timeArr.push(timeStart.format(f));
+      while (timeStart.format(f) !== timeEnd.format(f)) {
+        timeStart.add(30, "minutes");
+        timeArr.push(timeStart.format(f));
+      }
+      return timeArr;
+    }
+  };
+  useEffect(() => {}, []);
   // component render view
   return (
     <>
@@ -101,27 +116,50 @@ const ClassScheduleItem2 = () => {
                   );
                 }
               )[0];
-              const isExist = isExists(a !== undefined ? a.id : undefined);
+              let timeHit = 0;
+              const timeArr = [];
+              if (a !== undefined) {
+                const _timeArr = createTimeArr(a.timeStart, a.timeEnd);
+
+                _timeArr.forEach((time) => {
+                  const evalTime = moment(time, "HH:mm");
+
+                  if (evalTime.isBetween(trTimeStart, trTimeEnd)) {
+                    timeHit = timeHit + 1;
+                  }
+                });
+                // todo check for time hit
+                console.log(timeHit);
+              }
+
+              const isExist = false;
               return (
                 <React.Fragment key={index}>
                   {/** highlight half of the cell if contains :30 in start or end time */}
+
                   <td
                     className={
                       a === undefined
                         ? ""
-                        : a.timeEnd.includes(timeEnd.substr(0, 2) + ":30") &&
-                          isExist
-                        ? "highlight-top"
+                        : !a.timeStart.includes(":30") && !isExist
+                        ? "highlight-whole"
                         : a.timeStart.includes(":30") && !isExist
                         ? "highlight-bottom"
-                        : "highlight-whole"
+                        : a.timeEnd.includes(":30") && !isExist
+                        ? "highlight-top"
+                        : a.timeStart.includes(":30") && isExist
+                        ? "highlight-whole"
+                        : a.timeEnd.includes(":30") && isExist
+                        ? "highlight-top"
+                        : ""
                     }
                   >
                     {a === undefined ? "" : a.facultyName}
                     <br />
+                    {a === undefined ? "" : a.timeStart + " " + a.timeEnd}
+                    <br />
                     {a === undefined ? "" : a.subject}
                   </td>
-
                   <td className="fit">{a === undefined ? "" : a.section}</td>
                 </React.Fragment>
               );
