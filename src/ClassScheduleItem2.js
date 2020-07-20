@@ -1,39 +1,44 @@
 import React, { useState, useEffect } from "react";
 import moment from "moment";
 const ClassScheduleItem2 = () => {
-  const [idStores, setIdStore] = useState([]);
+  //format of time use
+  const f = "HH:mm";
+  const fA = "HH:mm A";
+  const idStores = [];
   const [timeRanges, setTimeRange] = useState([
     { id: 1, timeStart: "07:00", timeEnd: "8:00" },
     { id: 2, timeStart: "08:00", timeEnd: "9:00" },
     { id: 3, timeStart: "09:00", timeEnd: "10:00" },
+    { id: 4, timeStart: "10:00", timeEnd: "11:00" },
+    { id: 5, timeStart: "11:00", timeEnd: "12:00" },
   ]);
-  const idStoress = [];
-  const [days, setDay] = useState([
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
+
+  const [daysOfWeek, setDaysOfWeek] = useState([
+    { id: 1, name: "Monday" },
+    { id: 2, name: "Tuesday" },
+    { id: 3, name: "Wednesday" },
+    { id: 4, name: "Thursday" },
+    { id: 5, name: "Friday" },
+    { id: 6, name: "Saturday" },
+    { id: 7, name: "Sunday" },
   ]);
   const [colDays, setColDays] = useState([]);
   const [schedules, setSchedule] = useState([
     {
       id: 1,
-      timeStart: "07:00",
-      timeEnd: "09:30",
+      timeStart: "09:00",
+      timeEnd: "11:30",
       facultyName: "Juan Tamad",
       room: "NB101",
       section: "CIT",
       subject: "Law",
-      dayOfWeek: "Monday",
+      dayOfWeek: "Wednesday",
     },
     {
       id: 2,
       timeStart: "08:30",
-      timeEnd: "10:00",
-      facultyName: "Juan Tamad",
+      timeEnd: "09:30",
+      facultyName: "Juan Tamad2",
       room: "NB101",
       section: "BSBA",
       subject: "Law",
@@ -42,7 +47,7 @@ const ClassScheduleItem2 = () => {
     {
       id: 3,
       timeStart: "07:30",
-      timeEnd: "08:00",
+      timeEnd: "09:30",
       facultyName: "Tristan Tamad",
       room: "NB101",
       section: "BSBA",
@@ -50,32 +55,12 @@ const ClassScheduleItem2 = () => {
       dayOfWeek: "Thursday",
     },
   ]);
-
-  const isExists = (id) => {
-    if (id !== undefined) {
-      const _id = idStoress.filter((s) => s === id);
-
-      if (_id > 0) {
-        // id already exists
-        console.log(id + "exits");
-        return true;
-      } else {
-        // id not exists
-        //setIdStore((idStores) => [...idStores, id]);
-        idStoress.push(id);
-        console.log("First Check on id " + id);
-        return false;
-      }
-    }
-  };
-
+  // array that provides specific time structure of specific schedule
   const createTimeArr = (startTime, endTime) => {
     if (startTime !== undefined && endTime !== undefined) {
-      const f = "HH:mm";
       const timeStart = moment(startTime, f);
       const timeEnd = moment(endTime, f);
-      const timeArr = [];
-      timeArr.push(timeStart.format(f));
+      const timeArr = [timeStart.format(f)];
       while (timeStart.format(f) !== timeEnd.format(f)) {
         timeStart.add(30, "minutes");
         timeArr.push(timeStart.format(f));
@@ -87,80 +72,117 @@ const ClassScheduleItem2 = () => {
   // component render view
   return (
     <>
-      {/** iterate through time ranges */}
+      {/**
+       * iterate through time ranges for generating row headers
+       * iterate through days for generating columns headers
+       * filter schedule using current time range and day
+       * evaluate time and generate time sequence code for highlighting current cell
+       * render view that satisfy required output
+       */}
+
       {timeRanges.map(({ id, timeStart, timeEnd }) => {
-        const trTimeStart = moment(timeStart, "HH:mm");
-        const trTimeEnd = moment(timeEnd, "HH:mm");
+        const trTimeStart = moment(timeStart, f);
+        const trTimeEnd = moment(timeEnd, f);
         return (
           <tr key={id}>
-            {/**keys required */}
             <td className="fit">
-              {trTimeStart.format("HH:mm A")} - {trTimeEnd.format("HH:mm A")}
+              {trTimeStart.format(fA)} - {trTimeEnd.format(fA)}
             </td>
 
             {/** iterate through days */}
-            {days.map((d, index) => {
-              const a = schedules.filter(
+            {daysOfWeek.map(({ id, name }) => {
+              // concat code for identifying time structure
+              let timeSequence = "";
+
+              // get schedule
+              const schedule = schedules.filter(
                 ({
                   id,
                   timeStart: _timeStart,
                   timeEnd: _timeEnd,
                   dayOfWeek,
                 }) => {
-                  const sTimeStart = moment(_timeStart, "HH:mm");
-                  const sTimeEnd = moment(_timeEnd, "HH:mm");
+                  const sTimeStart = moment(_timeStart, f);
+                  const sTimeEnd = moment(_timeEnd, f);
                   return (
                     trTimeStart.isBefore(sTimeEnd) &&
                     trTimeEnd.isAfter(sTimeStart) &&
-                    dayOfWeek === d
+                    dayOfWeek === name
                   );
                 }
               )[0];
-              let timeHit = 0;
-              const timeArr = [];
-              if (a !== undefined) {
-                const _timeArr = createTimeArr(a.timeStart, a.timeEnd);
 
-                _timeArr.forEach((time) => {
-                  const evalTime = moment(time, "HH:mm");
+              if (schedule !== undefined) {
+                // create time array
+                const scheduleTimeArr = createTimeArr(
+                  schedule.timeStart,
+                  schedule.timeEnd
+                );
 
-                  if (evalTime.isBetween(trTimeStart, trTimeEnd)) {
-                    timeHit = timeHit + 1;
+                scheduleTimeArr.forEach((time) => {
+                  // time to evaluate
+                  const evalTime = moment(time, f);
+
+                  if (
+                    evalTime.isSame(trTimeStart) ||
+                    evalTime.isSame(trTimeEnd)
+                  ) {
+                    // evaluated time is the same
+                    timeSequence = timeSequence + "1";
+                    console.log(
+                      evalTime.format(f) +
+                        " is same of " +
+                        trTimeStart.format(f) +
+                        " or " +
+                        trTimeEnd.format(f) +
+                        " of " +
+                        schedule.facultyName +
+                        " schedule"
+                    );
+                  } else if (evalTime.isBetween(trTimeStart, trTimeEnd)) {
+                    // evaluated time in between
+                    timeSequence = timeSequence + "0";
+                    console.log(
+                      evalTime.format(f) +
+                        " is between of " +
+                        trTimeStart.format(f) +
+                        " or " +
+                        trTimeEnd.format(f) +
+                        schedule.facultyName +
+                        " schedule"
+                    );
                   }
                 });
-                // todo check for time hit
-                console.log(timeHit);
               }
-
-              const isExist = false;
               return (
-                <React.Fragment key={index}>
-                  {/** highlight half of the cell if contains :30 in start or end time */}
-
+                <React.Fragment key={id}>
+                  {/** highlight bottom half of the cell if time sequence is 01,
+                   *  top half for 10, 101 for whole
+                   */}
                   <td
                     className={
-                      a === undefined
+                      schedule === undefined
                         ? ""
-                        : !a.timeStart.includes(":30") && !isExist
+                        : timeSequence === "101"
                         ? "highlight-whole"
-                        : a.timeStart.includes(":30") && !isExist
+                        : timeSequence === "01"
                         ? "highlight-bottom"
-                        : a.timeEnd.includes(":30") && !isExist
-                        ? "highlight-top"
-                        : a.timeStart.includes(":30") && isExist
-                        ? "highlight-whole"
-                        : a.timeEnd.includes(":30") && isExist
+                        : timeSequence === "10"
                         ? "highlight-top"
                         : ""
                     }
                   >
-                    {a === undefined ? "" : a.facultyName}
+                    {schedule !== undefined ? schedule.facultyName : ""}
                     <br />
-                    {a === undefined ? "" : a.timeStart + " " + a.timeEnd}
+                    {schedule === undefined
+                      ? ""
+                      : schedule.timeStart + " " + schedule.timeEnd}
                     <br />
-                    {a === undefined ? "" : a.subject}
+                    {schedule === undefined ? "" : schedule.subject}
                   </td>
-                  <td className="fit">{a === undefined ? "" : a.section}</td>
+                  <td className="fit">
+                    {schedule === undefined ? "" : schedule.section}
+                  </td>
                 </React.Fragment>
               );
             })}
