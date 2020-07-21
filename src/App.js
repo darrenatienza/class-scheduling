@@ -4,9 +4,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { Table } from "react-bootstrap";
 import moment from "moment";
-import ClassScheduleItem2 from './ClassScheduleItem2';
+import ClassScheduleItem2 from "./ClassScheduleItem2";
 const App = () => {
-  
   return (
     <div className="App container">
       <header>Sample Test for Scheduling System</header>
@@ -31,9 +30,7 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-         <ClassScheduleItem2 />
-         
-          
+          <ClassScheduleItem2 />
         </tbody>
       </Table>
     </div>

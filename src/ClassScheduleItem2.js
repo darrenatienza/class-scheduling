@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Table } from "react-bootstrap";
 import moment from "moment";
 const ClassScheduleItem2 = () => {
   //format of time use
@@ -11,6 +12,7 @@ const ClassScheduleItem2 = () => {
     { id: 3, timeStart: "09:00", timeEnd: "10:00" },
     { id: 4, timeStart: "10:00", timeEnd: "11:00" },
     { id: 5, timeStart: "11:00", timeEnd: "12:00" },
+    { id: 6, timeStart: "12:00", timeEnd: "13:00" },
   ]);
 
   const [daysOfWeek, setDaysOfWeek] = useState([
@@ -27,22 +29,22 @@ const ClassScheduleItem2 = () => {
     {
       id: 1,
       timeStart: "09:00",
-      timeEnd: "11:30",
+      timeEnd: "10:30",
       facultyName: "Juan Tamad",
       room: "NB101",
       section: "CIT",
       subject: "Law",
-      dayOfWeek: "Wednesday",
+      dayOfWeek: "Monday",
     },
     {
       id: 2,
-      timeStart: "08:30",
-      timeEnd: "09:30",
+      timeStart: "10:30",
+      timeEnd: "13:00",
       facultyName: "Juan Tamad2",
       room: "NB101",
       section: "BSBA",
       subject: "Law",
-      dayOfWeek: "Tuesday",
+      dayOfWeek: "Monday",
     },
     {
       id: 3,
@@ -55,6 +57,7 @@ const ClassScheduleItem2 = () => {
       dayOfWeek: "Thursday",
     },
   ]);
+  const scheduless = [];
   // array that provides specific time structure of specific schedule
   const createTimeArr = (startTime, endTime) => {
     if (startTime !== undefined && endTime !== undefined) {
@@ -83,6 +86,7 @@ const ClassScheduleItem2 = () => {
       {timeRanges.map(({ id, timeStart, timeEnd }) => {
         const trTimeStart = moment(timeStart, f);
         const trTimeEnd = moment(timeEnd, f);
+
         return (
           <tr key={id}>
             <td className="fit">
@@ -93,9 +97,9 @@ const ClassScheduleItem2 = () => {
             {daysOfWeek.map(({ id, name }) => {
               // concat code for identifying time structure
               let timeSequence = "";
-
+              let found = false;
               // get schedule
-              const schedule = schedules.filter(
+              const schedule = scheduless.filter(
                 ({
                   id,
                   timeStart: _timeStart,
@@ -118,6 +122,12 @@ const ClassScheduleItem2 = () => {
                   schedule.timeStart,
                   schedule.timeEnd
                 );
+                const fidStores = idStores.filter((id) => id === schedule.id);
+                console.log(fidStores);
+                found = fidStores.length > 0 ? true : false;
+                if (!found) {
+                  idStores.push(schedule.id);
+                }
 
                 scheduleTimeArr.forEach((time) => {
                   // time to evaluate
@@ -127,7 +137,7 @@ const ClassScheduleItem2 = () => {
                     evalTime.isSame(trTimeStart) ||
                     evalTime.isSame(trTimeEnd)
                   ) {
-                    // evaluated time is the same
+                    // evaluated time if the same
                     timeSequence = timeSequence + "1";
                     console.log(
                       evalTime.format(f) +
@@ -171,17 +181,27 @@ const ClassScheduleItem2 = () => {
                         ? "highlight-top"
                         : ""
                     }
+                    style={{ padding: 0, height: "100%" }}
                   >
-                    {schedule !== undefined ? schedule.facultyName : ""}
+                    <Table style={{ margin: 0, padding: 0 }}>
+                      <tbody>
+                        <tr>
+                          <td></td>
+                        </tr>
+                        <tr>
+                          <td></td>
+                        </tr>
+                      </tbody>
+                    </Table>
+                    {found ? "-DO-" : ""}
+                    {schedule !== undefined && !found
+                      ? schedule.facultyName
+                      : ""}
                     <br />
-                    {schedule === undefined
-                      ? ""
-                      : schedule.timeStart + " " + schedule.timeEnd}
-                    <br />
-                    {schedule === undefined ? "" : schedule.subject}
+                    {schedule !== undefined && !found ? schedule.subject : ""}
                   </td>
                   <td className="fit">
-                    {schedule === undefined ? "" : schedule.section}
+                    {schedule !== undefined && !found ? schedule.section : ""}
                   </td>
                 </React.Fragment>
               );
