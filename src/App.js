@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { Table } from "react-bootstrap";
 import moment from "moment";
-import ClassScheduleItem2 from "./ClassScheduleItem2";
+import ClassScheduleItemV3 from "./ClassScheduleItemV3";
 const App = () => {
   return (
     <div className="App container">
@@ -30,7 +30,7 @@ const App = () => {
           </tr>
         </thead>
         <tbody>
-          <ClassScheduleItem2 />
+          <ClassScheduleItemV3 />
         </tbody>
       </Table>
     </div>

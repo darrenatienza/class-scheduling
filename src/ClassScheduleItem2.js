@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Table } from "react-bootstrap";
 import moment from "moment";
+import { findByLabelText } from "@testing-library/react";
 const ClassScheduleItem2 = () => {
   //format of time use
   const f = "HH:mm";
@@ -28,8 +29,8 @@ const ClassScheduleItem2 = () => {
   const [schedules, setSchedule] = useState([
     {
       id: 1,
-      timeStart: "09:00",
-      timeEnd: "10:30",
+      timeStart: "07:00",
+      timeEnd: "08:30",
       facultyName: "Juan Tamad",
       room: "NB101",
       section: "CIT",
@@ -38,26 +39,16 @@ const ClassScheduleItem2 = () => {
     },
     {
       id: 2,
-      timeStart: "10:30",
-      timeEnd: "13:00",
+      timeStart: "08:30",
+      timeEnd: "09:00",
       facultyName: "Juan Tamad2",
       room: "NB101",
       section: "BSBA",
       subject: "Law",
       dayOfWeek: "Monday",
     },
-    {
-      id: 3,
-      timeStart: "07:30",
-      timeEnd: "09:30",
-      facultyName: "Tristan Tamad",
-      room: "NB101",
-      section: "BSBA",
-      subject: "Law",
-      dayOfWeek: "Thursday",
-    },
   ]);
-  const scheduless = [];
+
   // array that provides specific time structure of specific schedule
   const createTimeArr = (startTime, endTime) => {
     if (startTime !== undefined && endTime !== undefined) {
@@ -99,7 +90,7 @@ const ClassScheduleItem2 = () => {
               let timeSequence = "";
               let found = false;
               // get schedule
-              const schedule = scheduless.filter(
+              const schedule = schedules.filter(
                 ({
                   id,
                   timeStart: _timeStart,
@@ -115,7 +106,23 @@ const ClassScheduleItem2 = () => {
                   );
                 }
               )[0];
-
+              const scheduless = schedules.filter(
+                ({
+                  id,
+                  timeStart: _timeStart,
+                  timeEnd: _timeEnd,
+                  dayOfWeek,
+                }) => {
+                  const sTimeStart = moment(_timeStart, f);
+                  const sTimeEnd = moment(_timeEnd, f);
+                  return (
+                    trTimeStart.isBefore(sTimeEnd) &&
+                    trTimeEnd.isAfter(sTimeStart) &&
+                    dayOfWeek === name
+                  );
+                }
+              );
+              console.log(scheduless.length);
               if (schedule !== undefined) {
                 // create time array
                 const scheduleTimeArr = createTimeArr(
@@ -123,7 +130,7 @@ const ClassScheduleItem2 = () => {
                   schedule.timeEnd
                 );
                 const fidStores = idStores.filter((id) => id === schedule.id);
-                console.log(fidStores);
+                //console.log(fidStores);
                 found = fidStores.length > 0 ? true : false;
                 if (!found) {
                   idStores.push(schedule.id);
@@ -139,7 +146,7 @@ const ClassScheduleItem2 = () => {
                   ) {
                     // evaluated time if the same
                     timeSequence = timeSequence + "1";
-                    console.log(
+                    /**console.log(
                       evalTime.format(f) +
                         " is same of " +
                         trTimeStart.format(f) +
@@ -147,20 +154,20 @@ const ClassScheduleItem2 = () => {
                         trTimeEnd.format(f) +
                         " of " +
                         schedule.facultyName +
-                        " schedule"
-                    );
+                        " schedule" 
+                    );*/
                   } else if (evalTime.isBetween(trTimeStart, trTimeEnd)) {
                     // evaluated time in between
                     timeSequence = timeSequence + "0";
-                    console.log(
+                    /**console.log(
                       evalTime.format(f) +
                         " is between of " +
                         trTimeStart.format(f) +
                         " or " +
                         trTimeEnd.format(f) +
                         schedule.facultyName +
-                        " schedule"
-                    );
+                        " schedule" 
+                    );*/
                   }
                 });
               }
@@ -169,37 +176,27 @@ const ClassScheduleItem2 = () => {
                   {/** highlight bottom half of the cell if time sequence is 01,
                    *  top half for 10, 101 for whole
                    */}
-                  <td
-                    className={
-                      schedule === undefined
-                        ? ""
-                        : timeSequence === "101"
-                        ? "highlight-whole"
-                        : timeSequence === "01"
-                        ? "highlight-bottom"
-                        : timeSequence === "10"
-                        ? "highlight-top"
-                        : ""
-                    }
-                    style={{ padding: 0, height: "100%" }}
-                  >
-                    <Table style={{ margin: 0, padding: 0 }}>
-                      <tbody>
-                        <tr>
-                          <td></td>
-                        </tr>
-                        <tr>
-                          <td></td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                    {found ? "-DO-" : ""}
-                    {schedule !== undefined && !found
-                      ? schedule.facultyName
-                      : ""}
-                    <br />
-                    {schedule !== undefined && !found ? schedule.subject : ""}
-                  </td>
+
+                  {schedule === undefined ? (
+                    <td></td>
+                  ) : (
+                    <>
+                      <td
+                        style={{
+                          padding: "0",
+                          display: "flex",
+                          justifyContent: "center",
+                          flexDirection: "column",
+                        }}
+                      >
+                        <div>
+                          {!found ? schedule.facultyName : "-DO-"}
+                          <br />
+                          {!found ? schedule.subject : ""}
+                        </div>
+                      </td>
+                    </>
+                  )}
                   <td className="fit">
                     {schedule !== undefined && !found ? schedule.section : ""}
                   </td>
