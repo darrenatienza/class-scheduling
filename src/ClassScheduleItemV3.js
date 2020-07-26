@@ -7,6 +7,7 @@ const ClassScheduleItemV3 = () => {
   const f = "HH:mm";
   const fA = "HH:mm A";
   const idStores = [];
+  const sectionStores = [];
   const [timeRanges, setTimeRange] = useState([
     { id: 1, timeStart: "07:00", timeEnd: "8:00" },
     { id: 2, timeStart: "08:00", timeEnd: "9:00" },
@@ -30,22 +31,24 @@ const ClassScheduleItemV3 = () => {
     {
       id: 1,
       timeStart: "07:00",
-      timeEnd: "08:30",
+      timeEnd: "08:00",
       facultyName: "Juan Tamad",
       room: "NB101",
       section: "CIT",
+      college: "CIT",
       subject: "Law",
       dayOfWeek: "Monday",
     },
     {
       id: 2,
       timeStart: "08:30",
-      timeEnd: "12:00",
+      timeEnd: "10:00",
       facultyName: "Juan Tamad2",
       room: "NB101",
       section: "BSBA",
+      college: "CABEIHM",
       subject: "Law",
-      dayOfWeek: "Monday",
+      dayOfWeek: "Saturday",
     },
   ]);
 
@@ -61,6 +64,65 @@ const ClassScheduleItemV3 = () => {
       }
       return timeArr;
     }
+  };
+  const bgColor = (college) => {
+    switch (college) {
+      case "CIT":
+        return "red";
+        break;
+      case "CABEIHM":
+        return "orange";
+        break;
+      case "CTE":
+        return "blue";
+        break;
+      default:
+        return "white";
+        break;
+    }
+  };
+  const height = (timeSequence) => {
+    switch (timeSequence) {
+      case "10":
+        return "50%";
+      case "01":
+        return "50%";
+      default:
+        return "100%";
+    }
+  };
+  const mstyle = (college, timeSequence) => {
+    const mPadding = "5px";
+    const half = "50%";
+    switch (timeSequence) {
+      case "10":
+        return {
+          backgroundColor: bgColor(college),
+          padding: mPadding,
+          height: half,
+        };
+      case "01":
+        return {
+          backgroundColor: bgColor(college),
+          padding: mPadding,
+          height: half,
+          position: "relative",
+          top: "50px",
+        };
+      default:
+        return {
+          backgroundColor: bgColor(college),
+          padding: mPadding,
+          height: "100%",
+        };
+    }
+    return {
+      backgroundColor: bgColor(college),
+      padding: "5px",
+      height: height(timeSequence),
+      position: "relative",
+      top: "50px",
+    };
   };
   useEffect(() => {}, []);
   // component render view
@@ -79,16 +141,13 @@ const ClassScheduleItemV3 = () => {
         const trTimeEnd = moment(timeEnd, f);
 
         return (
-          <tr key={trID}>
+          <tr key={trID} style={{ height: "100px" }}>
             <td className="fit">
               {trTimeStart.format(fA)} - {trTimeEnd.format(fA)}
             </td>
 
             {/** iterate through days */}
             {daysOfWeek.map(({ id: dowID, name }) => {
-              // concat code for identifying time structure
-              let timeSequence = "";
-              let found = false;
               // get schedules
               const scheduleList = schedules.filter(
                 ({
@@ -114,17 +173,27 @@ const ClassScheduleItemV3 = () => {
                    */}
 
                   {/** Faculty Name and Subjects */}
-                  <td style={{ padding: 0, textAlign: "center" }}>
+                  <td
+                    style={{
+                      padding: 0,
+                      textAlign: "center",
+                      height: "100px",
+                    }}
+                  >
                     {scheduleList.length > 0 ? (
                       scheduleList.map(
                         ({
                           id,
                           facultyName,
                           section,
+                          college,
                           subject,
                           timeStart,
                           timeEnd,
                         }) => {
+                          // concat code for identifying time structure
+                          let timeSequence = "";
+                          let found = false;
                           const scheduleTimeArr = createTimeArr(
                             timeStart,
                             timeEnd
@@ -133,7 +202,7 @@ const ClassScheduleItemV3 = () => {
                           const fidStores = idStores.filter(
                             (_id) => _id === id
                           );
-                          //console.log(fidStores);
+                          //check for stored ids
                           found = fidStores.length > 0 ? true : false;
                           if (!found) {
                             idStores.push(id);
@@ -174,34 +243,20 @@ const ClassScheduleItemV3 = () => {
                               );
                             }
                           });
-
+                          console.log(timeSequence);
                           return (
                             <React.Fragment key={id}>
-                              {section.includes("CIT") ? (
-                                <div
-                                  style={{
-                                    backgroundColor: "orange",
-                                    padding: "5px",
-                                  }}
-                                >
-                                  {!found ? facultyName : "-DO-"}
-                                  <br />
-                                  {!found ? subject : ""}
-                                </div>
-                              ) : (
-                                <>
-                                  <div
-                                    style={{
-                                      backgroundColor: "red",
-                                      display: "inline-block",
-                                    }}
-                                  >
-                                    {!found ? facultyName : "-DO-"}
-                                    <br />
-                                    {!found ? subject : ""}
-                                  </div>
-                                </>
-                              )}
+                              <div style={mstyle(college, timeSequence)}>
+                                {!found ? (
+                                  <span style={{ fontSize: "12px" }}>
+                                    {facultyName}
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: "12px" }}>-DO-</span>
+                                )}
+                                <br />
+                                {!found ? subject : ""}
+                              </div>
                             </React.Fragment>
                           );
                         }
@@ -214,63 +269,59 @@ const ClassScheduleItemV3 = () => {
                   </td>
 
                   {/** Section */}
-                  <td style={{ padding: 0, textAlign: "center" }}>
-                    {scheduleList.length > 1 ? (
-                      scheduleList.map(({ id, section }) => {
-                        return (
-                          <React.Fragment key={id}>
-                            {section.includes("CIT") ? (
-                              <div style={{ backgroundColor: "orange" }}>
-                                {section}
+                  <td
+                    style={{
+                      padding: 0,
+                      textAlign: "center",
+                      height: "100px",
+                    }}
+                  >
+                    {scheduleList.length > 0 ? (
+                      scheduleList.map(
+                        ({
+                          id,
+                          facultyName,
+                          section,
+                          college,
+                          subject,
+                          timeStart,
+                          timeEnd,
+                        }) => {
+                          // concat code for identifying time structure
+                          let timeSequence = "";
+                          let found2 = false;
+
+                          const fsectionStores = sectionStores.filter(
+                            (_section) => _section === section
+                          );
+                          //check for stored ids
+                          found2 = fsectionStores.length > 0 ? true : false;
+                          console.log(fsectionStores);
+                          if (!found2) {
+                            sectionStores.push(section);
+                          }
+
+                          return (
+                            <React.Fragment key={id}>
+                              <div style={mstyle(college, timeSequence)}>
+                                {!found2 ? (
+                                  <span style={{ fontSize: "12px" }}>
+                                    {section}
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: "12px" }}></span>
+                                )}
                               </div>
-                            ) : (
-                              <div style={{ backgroundColor: "red" }}>
-                                {section}
-                              </div>
-                            )}
-                          </React.Fragment>
-                        );
-                      })
-                    ) : scheduleList.length === 1 ? (
-                      <>
-                        {scheduleList[0].section.includes("CIT") ? (
-                          <div style={{ backgroundColor: "orange" }}>
-                            {scheduleList[0].section}
-                          </div>
-                        ) : (
-                          <div style={{ backgroundColor: "red" }}>
-                            {scheduleList[0].section}
-                          </div>
-                        )}
-                      </>
+                            </React.Fragment>
+                          );
+                        }
+                      )
+                    ) : scheduleList.length === 0 ? (
+                      <></>
                     ) : (
                       ""
                     )}
                   </td>
-
-                  {/** {schedule === undefined ? (
-                    <td></td>
-                  ) : (
-                    <>
-                      <td
-                        style={{
-                          padding: "0",
-                          display: "flex",
-                          justifyContent: "center",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <div>
-                          {!found ? schedule.facultyName : "-DO-"}
-                          <br />
-                          {!found ? schedule.subject : ""}
-                        </div>
-                      </td>
-                    </>
-                  )}
-                  <td className="fit">
-                    {schedule !== undefined && !found ? schedule.section : ""}
-                      </td> */}
                 </React.Fragment>
               );
             })}
