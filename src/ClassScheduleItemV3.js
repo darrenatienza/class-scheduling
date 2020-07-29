@@ -30,25 +30,36 @@ const ClassScheduleItemV3 = () => {
   const [schedules, setSchedule] = useState([
     {
       id: 1,
-      timeStart: "07:00",
-      timeEnd: "08:00",
+      timeStart: "07:30",
+      timeEnd: "09:00",
       facultyName: "Juan Tamad",
       room: "NB101",
       section: "CIT",
       college: "CIT",
       subject: "Law",
-      dayOfWeek: "Monday",
+      dayOfWeek: "Tuesday",
     },
     {
       id: 2,
-      timeStart: "08:30",
+      timeStart: "07:00",
       timeEnd: "10:00",
       facultyName: "Juan Tamad2",
       room: "NB101",
       section: "BSBA",
       college: "CABEIHM",
       subject: "Law",
-      dayOfWeek: "Saturday",
+      dayOfWeek: "Monday",
+    },
+    {
+      id: 3,
+      timeStart: "09:30",
+      timeEnd: "10:30",
+      facultyName: "Juan Tamad3",
+      room: "NB101",
+      section: "CIT",
+      college: "CIT",
+      subject: "Law",
+      dayOfWeek: "Tuesday",
     },
   ]);
 
@@ -91,38 +102,93 @@ const ClassScheduleItemV3 = () => {
         return "100%";
     }
   };
-  const mstyle = (college, timeSequence) => {
-    const mPadding = "5px";
+  const mstyle = (college, timeSequence, cellItemCount, isSection) => {
+    const mPadding = "0px";
     const half = "50%";
+
     switch (timeSequence) {
       case "10":
         return {
-          backgroundColor: bgColor(college),
+          backgroundColor: !isSection ? bgColor(college) : "",
           padding: mPadding,
           height: half,
+          lineHeight: "15px",
         };
       case "01":
-        return {
-          backgroundColor: bgColor(college),
-          padding: mPadding,
-          height: half,
-          position: "relative",
-          top: "50px",
-        };
+        console.log(cellItemCount);
+        let style = {};
+        if (cellItemCount > 1) {
+          style = {
+            backgroundColor: !isSection ? bgColor(college) : "",
+            lineHeight: "15px",
+            padding: mPadding,
+            height: half,
+            position: "relative",
+            top: "0px",
+          };
+        } else {
+          style = {
+            backgroundColor: !isSection ? bgColor(college) : "",
+            lineHeight: "15px",
+            padding: mPadding,
+            height: half,
+            position: "relative",
+            top: "37.5px",
+          };
+        }
+        return style;
+
       default:
         return {
-          backgroundColor: bgColor(college),
+          backgroundColor: !isSection ? bgColor(college) : "",
           padding: mPadding,
-          height: "100%",
+          lineHeight: "15px",
+          height: "101%",
+          position: "relative",
         };
     }
-    return {
-      backgroundColor: bgColor(college),
-      padding: "5px",
-      height: height(timeSequence),
-      position: "relative",
-      top: "50px",
-    };
+  };
+
+  const createTimeSequence = (
+    scheduleTimeArr = [],
+    timeStart,
+    timeEnd,
+    facultyName = ""
+  ) => {
+    let timeSequence = "";
+    scheduleTimeArr.forEach((time) => {
+      // time to evaluate
+      const evalTime = moment(time, f);
+
+      if (evalTime.isSame(timeStart) || evalTime.isSame(timeEnd)) {
+        // evaluated time if the same
+        timeSequence = timeSequence + "1";
+        console.log(
+          evalTime.format(f) +
+            " is same of " +
+            timeStart.format(f) +
+            " or " +
+            timeEnd.format(f) +
+            " of " +
+            facultyName +
+            " schedule"
+        );
+      } else if (evalTime.isBetween(timeStart, timeEnd)) {
+        // evaluated time in between
+        timeSequence = timeSequence + "0";
+        console.log(
+          evalTime.format(f) +
+            " is between of " +
+            timeStart.format(f) +
+            " or " +
+            timeEnd.format(f) +
+            facultyName +
+            " schedule"
+        );
+      }
+    });
+    console.log(timeSequence);
+    return timeSequence;
   };
   useEffect(() => {}, []);
   // component render view
@@ -141,8 +207,8 @@ const ClassScheduleItemV3 = () => {
         const trTimeEnd = moment(timeEnd, f);
 
         return (
-          <tr key={trID} style={{ height: "100px" }}>
-            <td className="fit">
+          <tr key={trID}>
+            <td className="fit col-header">
               {trTimeStart.format(fA)} - {trTimeEnd.format(fA)}
             </td>
 
@@ -173,13 +239,7 @@ const ClassScheduleItemV3 = () => {
                    */}
 
                   {/** Faculty Name and Subjects */}
-                  <td
-                    style={{
-                      padding: 0,
-                      textAlign: "center",
-                      height: "100px",
-                    }}
-                  >
+                  <td>
                     {scheduleList.length > 0 ? (
                       scheduleList.map(
                         ({
@@ -194,6 +254,7 @@ const ClassScheduleItemV3 = () => {
                           // concat code for identifying time structure
                           let timeSequence = "";
                           let found = false;
+                          const scheduleCount = scheduleList.length;
                           const scheduleTimeArr = createTimeArr(
                             timeStart,
                             timeEnd
@@ -207,55 +268,37 @@ const ClassScheduleItemV3 = () => {
                           if (!found) {
                             idStores.push(id);
                           }
-                          scheduleTimeArr.forEach((time) => {
-                            // time to evaluate
-                            const evalTime = moment(time, f);
-
-                            if (
-                              evalTime.isSame(trTimeStart) ||
-                              evalTime.isSame(trTimeEnd)
-                            ) {
-                              // evaluated time if the same
-                              timeSequence = timeSequence + "1";
-                              console.log(
-                                evalTime.format(f) +
-                                  " is same of " +
-                                  trTimeStart.format(f) +
-                                  " or " +
-                                  trTimeEnd.format(f) +
-                                  " of " +
-                                  facultyName +
-                                  " schedule"
-                              );
-                            } else if (
-                              evalTime.isBetween(trTimeStart, trTimeEnd)
-                            ) {
-                              // evaluated time in between
-                              timeSequence = timeSequence + "0";
-                              console.log(
-                                evalTime.format(f) +
-                                  " is between of " +
-                                  trTimeStart.format(f) +
-                                  " or " +
-                                  trTimeEnd.format(f) +
-                                  facultyName +
-                                  " schedule"
-                              );
-                            }
-                          });
-                          console.log(timeSequence);
+                          timeSequence = createTimeSequence(
+                            scheduleTimeArr,
+                            trTimeStart,
+                            trTimeEnd,
+                            facultyName
+                          );
                           return (
                             <React.Fragment key={id}>
-                              <div style={mstyle(college, timeSequence)}>
+                              <div
+                                style={mstyle(
+                                  college,
+                                  timeSequence,
+                                  scheduleCount,
+                                  false
+                                )}
+                              >
                                 {!found ? (
-                                  <span style={{ fontSize: "12px" }}>
-                                    {facultyName}
-                                  </span>
+                                  <>
+                                    <span
+                                      style={{
+                                        fontSize: "12px",
+                                        margin: "0px",
+                                      }}
+                                    >
+                                      {facultyName} {subject}
+                                    </span>
+                                  </>
                                 ) : (
                                   <span style={{ fontSize: "12px" }}>-DO-</span>
                                 )}
                                 <br />
-                                {!found ? subject : ""}
                               </div>
                             </React.Fragment>
                           );
@@ -269,13 +312,7 @@ const ClassScheduleItemV3 = () => {
                   </td>
 
                   {/** Section */}
-                  <td
-                    style={{
-                      padding: 0,
-                      textAlign: "center",
-                      height: "100px",
-                    }}
-                  >
+                  <td>
                     {scheduleList.length > 0 ? (
                       scheduleList.map(
                         ({
@@ -289,27 +326,45 @@ const ClassScheduleItemV3 = () => {
                         }) => {
                           // concat code for identifying time structure
                           let timeSequence = "";
-                          let found2 = false;
+                          let foundSection = false;
+                          const scheduleCount = scheduleList.length;
+                          const scheduleTimeArr = createTimeArr(
+                            timeStart,
+                            timeEnd
+                          );
 
                           const fsectionStores = sectionStores.filter(
-                            (_section) => _section === section
+                            (_section) => _section === id + "" + section
                           );
                           //check for stored ids
-                          found2 = fsectionStores.length > 0 ? true : false;
-                          console.log(fsectionStores);
-                          if (!found2) {
-                            sectionStores.push(section);
-                          }
+                          foundSection =
+                            fsectionStores.length > 0 ? true : false;
 
+                          if (!foundSection) {
+                            sectionStores.push(id + "" + section);
+                          }
+                          timeSequence = createTimeSequence(
+                            scheduleTimeArr,
+                            trTimeStart,
+                            trTimeEnd,
+                            facultyName
+                          );
                           return (
                             <React.Fragment key={id}>
-                              <div style={mstyle(college, timeSequence)}>
-                                {!found2 ? (
+                              <div
+                                style={mstyle(
+                                  college,
+                                  timeSequence,
+                                  scheduleCount,
+                                  true
+                                )}
+                              >
+                                {!foundSection ? (
                                   <span style={{ fontSize: "12px" }}>
                                     {section}
                                   </span>
                                 ) : (
-                                  <span style={{ fontSize: "12px" }}></span>
+                                  ""
                                 )}
                               </div>
                             </React.Fragment>

@@ -9,7 +9,7 @@ const App = () => {
   return (
     <div className="App container">
       <header>Sample Test for Scheduling System</header>
-      <Table striped bordered hover responsive>
+      <Table bordered hover responsive>
         <thead>
           <tr>
             <th>Time</th>
