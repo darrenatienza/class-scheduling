@@ -4,36 +4,34 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import { Table } from "react-bootstrap";
 import moment from "moment";
-import ClassScheduleItemV3 from "./ClassScheduleItemV3";
+
+import useAxios, { configure } from "axios-hooks";
+import LRU from "lru-cache";
+import Axios from "axios";
+import { Login } from "./components/login";
+import { Dashboard } from "./components/dashboard";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
+const axios = Axios.create({
+  baseURL: "http://localhost:39048/api",
+});
+const cache = new LRU({ max: 10 });
+configure({ axios, cache });
+
 const App = () => {
   return (
-    <div className="App container">
-      <header>Sample Test for Scheduling System</header>
-      <Table bordered hover responsive>
-        <thead>
-          <tr>
-            <th>Time</th>
-            <th>Monday</th>
-            <th>Section</th>
-            <th>Tuesday</th>
-            <th>Section</th>
-            <th>Wednesday</th>
-            <th>Section</th>
-            <th>Thrusday</th>
-            <th>Section</th>
-            <th>Friday</th>
-            <th>Section</th>
-            <th>Saturday</th>
-            <th>Section</th>
-            <th>Sunday</th>
-            <th>Section</th>
-          </tr>
-        </thead>
-        <tbody>
-          <ClassScheduleItemV3 />
-        </tbody>
-      </Table>
-    </div>
+    <Router>
+      {/* A <Switch> looks through its children <Route>s and
+            renders the first one that matches the current URL. */}
+      <Switch>
+        <Route path="/about"></Route>
+        <Route path="/dashboard">
+          <Dashboard />
+        </Route>
+        <Route path="/">
+          <Login />
+        </Route>
+      </Switch>
+    </Router>
   );
 };
 

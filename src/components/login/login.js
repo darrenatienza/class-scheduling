@@ -2,15 +2,16 @@ import React, { useState, useEffect } from "react";
 import useAxios from "axios-hooks";
 import { Card, Form, Button } from "react-bootstrap";
 import { useAuth } from "../../entities";
-import "./login.css";
+import "./Login.css";
+import { useHistory } from "react-router-dom";
 
-const Index = () => {
+const Login = () => {
   const [
-    { data: postData, loading: postLoading, error: postError },
+    { data: token, loading: postLoading, error: postError },
     executePost,
   ] = useAxios(
     {
-      url: "http://localhost:39048/api/v2/auths",
+      url: "/v2/auths",
       method: "POST",
     },
     { manual: true }
@@ -18,31 +19,31 @@ const Index = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
   const [auth, { authenticate }] = useAuth();
-
-  const handleSubmit = (event) => {
-    executePost({
-      data: {
-        userName: userName,
-        password: password,
-      },
-    });
-    console.log("afds");
+  let history = useHistory();
+  const handleSubmit = async (event) => {
     event.preventDefault();
-  };
-  useEffect(() => {
-    if (postData != "") {
-      localStorage.setItem("auth-token", postData);
+
+    try {
+      await executePost({
+        data: {
+          userName: userName,
+          password: password,
+        },
+      });
+      localStorage.setItem("auth-token", token);
+      history.push("/dashboard");
+    } catch (err) {
+      setPassword("");
+      console.log(err);
     }
-    return () => {
-      //cleanup
-    };
-  }, [postData]);
+  };
+
   return (
     <>
       <Card style={{ width: "20rem" }}>
         <Card.Header>Login - Scheduling System</Card.Header>
         <Card.Body>
-          <Form onSubmit={(e) => handleSubmit(e)}>
+          <Form onSubmit={handleSubmit}>
             <Form.Group controlId="formBasicEmail">
               <Form.Label>User Name</Form.Label>
               <Form.Control
@@ -62,6 +63,7 @@ const Index = () => {
               />
             </Form.Group>
             {postLoading && <Form.Label>Loading...</Form.Label>}
+
             <Form.Group controlId="formBasicCheckbox">
               <Form.Check type="checkbox" label="Check me out" />
             </Form.Group>
@@ -76,4 +78,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Login;
