@@ -42,7 +42,7 @@ const Login = () => {
         <Card.Header>Login - Scheduling System</Card.Header>
         <Card.Body>
           <Form onSubmit={handleSubmit(onSubmit)}>
-            <Form.Group controlId="formBasicEmail">
+            <Form.Group controlId="fromBasicUserName">
               <Form.Label>User Name</Form.Label>
               <Form.Control
                 name="userName"

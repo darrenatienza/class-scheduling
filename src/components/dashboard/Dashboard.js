@@ -9,13 +9,13 @@ import {
   useHistory,
   useLocation,
 } from "react-router-dom";
-import ScheduleForm from "../schedule/ScheduleForm";
+import ClassScheduleForm from "../schedule/ClassScheduleForm";
 
 const Dashboard = () => {
   return (
     <>
       <NavBar />
-      <ScheduleForm></ScheduleForm>
+      <ClassScheduleForm></ClassScheduleForm>
     </>
   );
 };

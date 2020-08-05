@@ -24,11 +24,14 @@ const App = () => {
             renders the first one that matches the current URL. */}
       <Switch>
         <Route path="/about"></Route>
+        <Route path="/login">
+          <Login />
+        </Route>
         <Route path="/dashboard">
           <Dashboard />
         </Route>
         <Route path="/">
-          <Login />
+          <Dashboard />
         </Route>
       </Switch>
     </Router>
